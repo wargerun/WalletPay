@@ -1,6 +1,6 @@
 using System;
 
-namespace WalletPay.WebService
+namespace WalletPay.WebService.Models
 {
     public class WeatherForecast
     {

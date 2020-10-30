@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using WalletPay.Data.Repositories.UserRepositories;
+using WalletPay.Data.Repositories.WalletRepositories;
+
 namespace WalletPay.WebService
 {
     public class Startup
@@ -20,6 +23,9 @@ namespace WalletPay.WebService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddTransient<IUserRepository, MockUserRepository>();
+            services.AddTransient<IWalletRepository, MockWalletRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
