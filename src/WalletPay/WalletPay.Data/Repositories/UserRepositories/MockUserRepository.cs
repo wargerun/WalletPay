@@ -1,4 +1,6 @@
 ﻿
+using System.Threading.Tasks;
+
 using WalletPay.Data.Entities;
 
 namespace WalletPay.Data.Repositories.UserRepositories
@@ -12,6 +14,11 @@ namespace WalletPay.Data.Repositories.UserRepositories
                 Id = userId,
                 Name = $"Пользователь с id={userId}"
             };
+        }
+
+        public Task<User> GetUserAsync(int userId)
+        {
+            return Task.FromResult(GetUser(userId));
         }
     }
 }
