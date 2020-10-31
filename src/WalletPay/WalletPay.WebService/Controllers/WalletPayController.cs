@@ -68,13 +68,22 @@ namespace WalletPay.WebService.Controllers
 
             Wallet wallet = await _walletRepository.GetWalletByUserIdAsync(userId);
 
+            Account account = new()
+            {
+                WalletId = wallet.Id,
+                Amount = depositRequest.Amount,
+                Name = depositRequest.AccountName,
+                Currency = depositRequest.CodeCurrency,
+            };
+
             if (depositRequest.AccountId.HasValue)
             {
-                await _walletPay.DepositAsync(wallet.Id, depositRequest.AccountId.Value, depositRequest.Amount);
+                account.Id = depositRequest.AccountId.Value;
+                await _walletPay.DepositAsync(account.WalletId, account.Id, account.Amount);
             }
             else
             {
-                await _walletPay.DepositAsync(wallet.Id, depositRequest.CodeCurrency, depositRequest.Amount);
+                await _walletPay.DepositAsync(account);
             }
 
             return Ok();

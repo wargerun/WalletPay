@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="WalletPay.Data.Entities.Account">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAAAAAAAAAAAAAASACCAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\Account.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Wallet" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="WalletPay.Data.Entities.User">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="WalletPay.Data.Entities.Wallet">
+    <Position X="3.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAkAAAAAAAAAAAAAAgAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\Wallet.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Status" />
+      <Property Name="User" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="WalletPay.Data.Repositories.UserRepositories.UserDbRepository" BaseTypeListCollapsed="true">
+    <Position X="12" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAQAAAAA=</HashCode>
+      <FileName>Repositories\UserRepositories\UserDbRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.1" />
+  </Class>
+  <Class Name="WalletPay.Data.Repositories.WalletRepositories.WalletDbRepository" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="1" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AgBBAAAEAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\WalletRepositories\WalletDbRepository.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="WalletPay.Data.Context.WalletPayDbContext">
+    <Position X="0.75" Y="5.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAQAAAAAAAAAAAABAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Context\WalletPayDbContext.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.EntityFrameworkCore.DbContext" Collapsed="true">
+    <Position X="0.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Enum Name="WalletPay.Data.Entities.WalletStatus">
+    <Position X="3.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Entities\WalletStatus.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

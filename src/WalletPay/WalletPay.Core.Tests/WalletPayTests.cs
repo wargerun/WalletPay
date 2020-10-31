@@ -18,7 +18,7 @@ namespace WalletPay.Core.Tests
                 Status = WalletStatus.Active,
                 Accounts = new List<Account>()
                 {
-                    new Account()
+                    new()
                     {
                         Id = 123,
                         Currency = "RUB",
@@ -26,7 +26,7 @@ namespace WalletPay.Core.Tests
                     }
                 }
             },
-            new Wallet()
+            new()
             {
                 Id = 2,
                 Status = WalletStatus.Active,
@@ -37,7 +37,7 @@ namespace WalletPay.Core.Tests
                 Status = WalletStatus.Active,
                 Accounts = new List<Account>()
                 {
-                    new Account()
+                    new()
                     {
                         Id = 123444,
                         Currency = "EUR",
@@ -53,23 +53,28 @@ namespace WalletPay.Core.Tests
         public async Task DepositAsyncTest(int walletId, string codeCurrency, decimal amount, decimal expectedAmount)
         {
             // given
-            MockWalletRepository walletRepository = new MockWalletRepository(wallets);
+            MockWalletRepository walletRepository = new(wallets);
             WalletPay walletPay = new WalletPay(walletRepository);
 
             // then
-            Account account = await walletPay.DepositAsync(walletId, codeCurrency, amount);
+            Account account = await walletPay.DepositAsync(new()
+            {
+                WalletId = walletId,
+                Currency = codeCurrency,
+                Amount = amount
+            });
 
             // when
             Assert.Equal(expectedAmount, account.Amount);
         }
 
         [Theory]
-        [InlineData(1, 123,     666.66,     671.66)]
-        [InlineData(3, 123444,  300.123,    800.123)]
+        [InlineData(1, 123, 666.66, 671.66)]
+        [InlineData(3, 123444, 300.123, 800.123)]
         public async Task DepositAsyncByAccountIdTest(int walletId, int accountId, decimal amount, decimal expectedAmount)
         {
             // given
-            MockWalletRepository walletRepository = new MockWalletRepository(wallets);
+            MockWalletRepository walletRepository = new(wallets);
             WalletPay walletPay = new WalletPay(walletRepository);
 
             // then

@@ -4,12 +4,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletPay.WebService", "WalletPay.WebService\WalletPay.WebService.csproj", "{77A4AB75-FF47-482D-BE1F-41A48F78D821}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC9B97F1-5293-4D95-942B-044AB3026B7C} = {FC9B97F1-5293-4D95-942B-044AB3026B7C}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletPay.Data", "WalletPay.Data\WalletPay.Data.csproj", "{61230BF7-93DB-4336-93A6-09328EAFFF02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletPay.Core", "WalletPay.Core\WalletPay.Core.csproj", "{B29CF688-9AFC-4D7F-9520-334872E7980E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletPay.Core", "WalletPay.Core\WalletPay.Core.csproj", "{B29CF688-9AFC-4D7F-9520-334872E7980E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WalletPay.Core.Tests", "WalletPay.Core.Tests\WalletPay.Core.Tests.csproj", "{FC9B97F1-5293-4D95-942B-044AB3026B7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WalletPay.Core.Tests", "WalletPay.Core.Tests\WalletPay.Core.Tests.csproj", "{FC9B97F1-5293-4D95-942B-044AB3026B7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

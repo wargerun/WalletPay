@@ -17,18 +17,15 @@ namespace WalletPay.Core
         }
 
         /// <summary>
-        /// Асинхронная версия метода, пополнения кошелька
+        /// Асинхронная версия метода, создания счета в кошельке
         /// </summary>
         /// <param name="userId">ID пользователя</param>
         /// <param name="codeCurrency">код валюты</param>
         /// <param name="amount">сумма пополнения</param>
         /// <returns>актуальна валюта после успешной транзакции</returns>
-        public async Task<Account> DepositAsync(int walletId, string codeCurrency, decimal amount)
+        public async Task<Account> DepositAsync(Account inputAccount)
         {
-            Wallet wallet = await _walletRepository.GetWalletByIdAsync(walletId);
-            AssertWalletExist(wallet, walletId);
-
-            Account account = await _walletRepository.AddAccountAsync(walletId, codeCurrency, amount);
+            Account account = await _walletRepository.AddAccountAsync(inputAccount);
             return account;
         }
 

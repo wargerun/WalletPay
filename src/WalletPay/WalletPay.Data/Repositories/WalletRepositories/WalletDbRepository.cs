@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using WalletPay.Data.Context;
@@ -20,56 +18,38 @@ namespace WalletPay.Data.Repositories.WalletRepositories
             _dbContext = new WalletPayDbContext();
         }
 
-        public async Task<Account> AddAccountAsync(int walletId, string codeCurrency, decimal amount)
+        public async Task<Account> AddAccountAsync(Account account, CancellationToken token = default)
         {
-            Wallet wallet = await GetWalletByIdAsync(walletId);
+            Wallet wallet = await GetWalletByIdAsync(account.WalletId, token);
 
             if (wallet is null)
             {
-                throw new InvalidOperationException($"Кошелек с id={walletId} не найден.");
+                throw new InvalidOperationException($"Кошелек с id={account.WalletId} не найден.");
             }
 
-            Account account = new()
-            {
-                Amount = amount,
-                Currency = codeCurrency,
-                WalletId = walletId,
-            };
-
             _dbContext.Accounts.Add(account);
-
-            await _dbContext.SaveChangesAsync();
-
+            await _dbContext.SaveChangesAsync(token);
             return account;
         }
 
-        public Task<Wallet> GetWalletByIdAsync(int walletId)
-        {
-            return _dbContext.Wallets.FindAsync(walletId).AsTask();
-        }
+        public Task<Wallet> GetWalletByIdAsync(int walletId, CancellationToken token = default) => _dbContext.Wallets.Include(w => w.Accounts).SingleOrDefaultAsync(w => w.Id == walletId, token);
 
-        public Task<Wallet> GetWalletByUserIdAsync(int userId)
-        {
-            return _dbContext.Wallets.SingleOrDefaultAsync(w => w.UserId == userId);
-        }
+        public Task<Wallet> GetWalletByUserIdAsync(int userId, CancellationToken token = default) => _dbContext.Wallets.Include(w => w.Accounts).SingleOrDefaultAsync(w => w.UserId == userId, token);
 
-        public async Task<Account> UpdateAccountAsync(int accountId, decimal newAmmount)
+        public async Task<Account> UpdateAccountAsync(int accountId, decimal newAmmount, CancellationToken token = default)
         {
-            Account account = await _dbContext.Accounts.FindAsync(accountId);
+            Account account = await _dbContext.Accounts.SingleOrDefaultAsync(a => a.Id == accountId, token);
 
             if (account is null)
             {
                 throw new InvalidOperationException($"Счет {accountId} пользователя не найден.");
             }
 
-            account = await UpdateAccountAsync(account);
+            account.Amount = newAmmount;
+
+            await _dbContext.SaveChangesAsync(token);
 
             return account;
-        }
-
-        public Task<Account> UpdateAccountAsync(Account accountForUpdate)
-        {
-            throw new NotImplementedException();
         }
     }
 }

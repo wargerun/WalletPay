@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using WalletPay.Data.Entities;
@@ -17,29 +18,20 @@ namespace WalletPay.Core.Tests
             _wallets = wallets;
         }
 
-        public Task<Wallet> GetWalletByUserIdAsync(int userId) => Task.FromResult(_wallets.SingleOrDefault(w => w.UserId == userId));
+        public Task<Wallet> GetWalletByUserIdAsync(int userId, CancellationToken token = default) => Task.FromResult(_wallets.SingleOrDefault(w => w.UserId == userId));
 
-        public Task<Wallet> GetWalletByIdAsync(int walletId) => Task.FromResult(_wallets.SingleOrDefault(w => w.Id == walletId));
+        public Task<Wallet> GetWalletByIdAsync(int walletId, CancellationToken token = default) => Task.FromResult(_wallets.SingleOrDefault(w => w.Id == walletId));
 
-        public async Task<Account> AddAccountAsync(int walletId, string codeCurrency, decimal amount)
+        public Task<Account> AddAccountAsync(Account account, CancellationToken token = default)
         {
-            Wallet wallet = await GetWalletByIdAsync(walletId);
-
-            return new Account()
-            {
-                Amount = amount,
-                Currency = codeCurrency,
-                WalletId = walletId,
-                Wallet = wallet,
-            };
+            return Task.FromResult(account);
         }
 
-        public async Task<Account> UpdateAccountAsync(int accountId, decimal newAmmount)
+        public Task<Account> UpdateAccountAsync(int accountId, decimal newAmmount, CancellationToken token = default)
         {
-            Wallet wallet = await GetWalletByIdAsync(walletId);
-            Account account = wallet.Accounts.Single(a => a.Id == accountId);
+            Account account = _wallets.Where(a => a.Accounts != null).SelectMany(w => w.Accounts).SingleOrDefault(a => a.Id == accountId);
             account.Amount = newAmmount;
-            return account;
+            return Task.FromResult(account);
         }
     }
 }
