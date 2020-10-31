@@ -40,12 +40,15 @@ namespace WalletPay.WebService.Controllers
             }
 
             User user = _userRepository.GetUser(userId);
-            Wallet wallet = await _walletRepository.GetWalletByUserIdAsync(user.Id);
-            return Ok(new GetUserWalletResponse
+
+            if (user is null)
             {
-                Wallet = new WalletDto(wallet),
-                User = new UserDto(user),
-            });
+                return NotFound("User is not found");
+            }
+
+            Wallet wallet = await _walletRepository.GetWalletByUserIdAsync(user.Id);
+
+            return Ok(new GetUserWalletResponse(user, wallet));
         }
 
         [HttpPost("deposit")]

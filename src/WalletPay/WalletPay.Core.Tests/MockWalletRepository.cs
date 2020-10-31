@@ -1,5 +1,4 @@
 ﻿
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,12 +24,6 @@ namespace WalletPay.Core.Tests
         public async Task<Account> AddAccountAsync(int walletId, string codeCurrency, decimal amount)
         {
             Wallet wallet = await GetWalletByIdAsync(walletId);
-            Account account = wallet.Accounts?.SingleOrDefault(a => a.WalletId == walletId && a.Currency == codeCurrency);
-
-            if (account != null)
-            {
-                throw new InvalidOperationException($"Код валюты должен быть уникален в одном кошельке");
-            }
 
             return new Account()
             {
@@ -41,10 +34,10 @@ namespace WalletPay.Core.Tests
             };
         }
 
-        public async Task<Account> UpdateAccountAsync(int walletId, int accountId, decimal newAmmount)
+        public async Task<Account> UpdateAccountAsync(int accountId, decimal newAmmount)
         {
             Wallet wallet = await GetWalletByIdAsync(walletId);
-            Account account = wallet.Accounts.Single(a => a.AccountId == accountId);
+            Account account = wallet.Accounts.Single(a => a.Id == accountId);
             account.Amount = newAmmount;
             return account;
         }

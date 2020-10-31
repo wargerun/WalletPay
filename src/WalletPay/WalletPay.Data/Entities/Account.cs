@@ -2,9 +2,9 @@
 {
     public class Account
     {
-        public int WalletId { get; set; }
+        public int Id { get; set; }
 
-        public int AccountId { get; set; }
+        public int WalletId { get; set; }
 
         public string Name { get; set; }
 

@@ -27,8 +27,8 @@ namespace WalletPay.WebService
                 options.JsonSerializerOptions.IgnoreNullValues = true;
             });
 
-            services.AddScoped<IUserRepository, MockUserRepository>();
-            services.AddScoped<IWalletRepository, MockWalletRepository>();
+            services.AddScoped<IUserRepository, UserDbRepository>();
+            services.AddScoped<IWalletRepository, WalletDbRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

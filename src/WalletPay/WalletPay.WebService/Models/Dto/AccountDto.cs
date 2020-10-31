@@ -20,7 +20,7 @@ namespace WalletPay.WebService.Models.Dto
 
         public AccountDto(Account account)
         {
-            AccountId = account.AccountId;
+            AccountId = account.Id;
             Name = account.Name;
             Currency = account.Currency;
             Amount = account.Amount;

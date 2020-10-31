@@ -20,7 +20,7 @@ namespace WalletPay.Core.Tests
                 {
                     new Account()
                     {
-                        AccountId = 123,
+                        Id = 123,
                         Currency = "RUB",
                         Amount = 5,
                     }
@@ -39,7 +39,7 @@ namespace WalletPay.Core.Tests
                 {
                     new Account()
                     {
-                        AccountId = 123444,
+                        Id = 123444,
                         Currency = "EUR",
                         Amount = 500,
                     }

@@ -44,7 +44,7 @@ namespace WalletPay.Core
             Wallet wallet = await _walletRepository.GetWalletByIdAsync(walletId);
             AssertWalletExist(wallet, walletId);
 
-            Account account = wallet.Accounts?.SingleOrDefault(a => a.AccountId == accountId);
+            Account account = wallet.Accounts?.SingleOrDefault(a => a.Id == accountId);
 
             if (account is null)
             {
@@ -52,7 +52,7 @@ namespace WalletPay.Core
             }
 
             decimal newAmmount = account.Amount + amount;
-            account = await _walletRepository.UpdateAccountAsync(walletId, accountId, newAmmount);
+            account = await _walletRepository.UpdateAccountAsync(accountId, newAmmount);
 
             return account;
         }

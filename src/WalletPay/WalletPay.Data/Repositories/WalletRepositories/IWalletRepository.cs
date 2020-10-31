@@ -22,6 +22,6 @@ namespace WalletPay.Data.Repositories.WalletRepositories
 
         Task<Account> AddAccountAsync(int walletId, string codeCurrency, decimal amount);
 
-        Task<Account> UpdateAccountAsync(int walletId, int accountId, decimal newAmmount);
+        Task<Account> UpdateAccountAsync(int accountId, decimal newAmmount);
     }
 }
