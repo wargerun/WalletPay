@@ -6,6 +6,8 @@ namespace WalletPay.WebService.Models.Requests
     {
         public int UserId { get; set; }
 
+        public int? AccountId { get; set; }
+
         [Required]
         public string CodeCurrency { get; set; }
 

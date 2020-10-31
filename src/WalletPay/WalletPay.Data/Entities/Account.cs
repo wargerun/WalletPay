@@ -1,10 +1,14 @@
 ﻿namespace WalletPay.Data.Entities
 {
-    public class Currency
+    public class Account
     {
         public int WalletId { get; set; }
 
-        public string Code { get; set; }
+        public int AccountId { get; set; }
+
+        public string Name { get; set; }
+
+        public string Currency { get; set; }
 
         public decimal Amount { get; set; }  
 

@@ -3,6 +3,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
+using WalletPay.Core;
 using WalletPay.Data.Entities;
 using WalletPay.Data.Repositories.UserRepositories;
 using WalletPay.Data.Repositories.WalletRepositories;
@@ -17,6 +18,7 @@ namespace WalletPay.WebService.Controllers
     [Route("[controller]")]
     public class WalletPayController : ControllerBase
     {
+        private readonly Core.WalletPay _walletPay;
         private readonly IUserRepository _userRepository;
         private readonly IWalletRepository _walletRepository;
 
@@ -24,23 +26,21 @@ namespace WalletPay.WebService.Controllers
             IUserRepository userRepository,
             IWalletRepository walletRepository)
         {
+            _walletPay = new Core.WalletPay(walletRepository);
             _userRepository = userRepository;
             _walletRepository = walletRepository;
         }
 
         [HttpGet("GetWallet")]
-        public ActionResult<GetUserWalletResponse> GetWallet(GetUserWalletRequest getUserWalletRequest)
+        public async Task<ActionResult<GetUserWalletResponse>> GetWallet(int userId)
         {
-            int userId = getUserWalletRequest.UserId;
-
             if (userId == 0)
             {
                 return BadRequest(Errors.InvalidUserId);
             }
 
             User user = _userRepository.GetUser(userId);
-            Wallet wallet = _walletRepository.GetUserWallet(user.Id);
-
+            Wallet wallet = await _walletRepository.GetWalletByUserIdAsync(user.Id);
             return Ok(new GetUserWalletResponse
             {
                 Wallet = new WalletDto(wallet),
@@ -63,7 +63,16 @@ namespace WalletPay.WebService.Controllers
                 return BadRequest(Errors.InvalidAmount);
             }
 
-            await _walletRepository.DepositAsync(userId, depositRequest.CodeCurrency, depositRequest.Amount);
+            Wallet wallet = await _walletRepository.GetWalletByUserIdAsync(userId);
+
+            if (depositRequest.AccountId.HasValue)
+            {
+                await _walletPay.DepositAsync(wallet.Id, depositRequest.AccountId.Value, depositRequest.Amount);
+            }
+            else
+            {
+                await _walletPay.DepositAsync(wallet.Id, depositRequest.CodeCurrency, depositRequest.Amount);
+            }
 
             return Ok();
         }

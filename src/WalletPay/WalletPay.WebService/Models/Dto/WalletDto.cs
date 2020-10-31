@@ -16,17 +16,17 @@ namespace WalletPay.WebService.Models.Dto
         [JsonPropertyName("status")]
         public string Status { get; }
 
-        [JsonPropertyName("currencies")]
-        public List<CurrencyDto> Currencies { get; }
+        [JsonPropertyName("accounts")]
+        public List<AccountDto> Accounts { get; }
 
         public WalletDto(Wallet wallet)
         {
-            CurrenciesUpdated = wallet.CurrenciesUpdated;
+            CurrenciesUpdated = wallet.AccountUpdated;
             Status = wallet.Status.ToString();
 
-            if (wallet.Currencies != null)
+            if (wallet.Accounts != null)
             {
-                Currencies = wallet.Currencies.Select(c => new CurrencyDto(c)).ToList();
+                Accounts = wallet.Accounts.Select(c => new AccountDto(c)).ToList();
             }
         }
     }

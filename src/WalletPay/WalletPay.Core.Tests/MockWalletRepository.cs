@@ -5,8 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using WalletPay.Data.Entities;
+using WalletPay.Data.Repositories.WalletRepositories;
 
-namespace WalletPay.Data.Repositories.WalletRepositories
+namespace WalletPay.Core.Tests
 {
     public class MockWalletRepository : IWalletRepository
     {
