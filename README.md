@@ -2,16 +2,16 @@
 
 WalletPay - Сервис кошелька пользователя
 
-- Приложение имеет стандартную трёхуровневую архитектуру. Вся бизнес-логика сконцентрирована в [WalletPayService.](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/WalletPayService.cs#L11). Контроллер проксируют запросы в сервис.
+- Приложение имеет стандартную трёхуровневую архитектуру. Вся бизнес-логика сконцентрирована в [WalletPayService](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/WalletPayService.cs#L11). Контроллер проксируют запросы в сервис.
 - Для хранения данных использовал базу данных SQLite
 - Обмен валюты происходит через интерфейс [ICurrencyConversion](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/CurrencyConversions/ICurrencyConversion.cs#L3), в данный момент реализованно следующее Api [XECurrencyConversion](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/CurrencyConversions/XECurrencyConversion.cs) (Не для коммерческого использования)
 
-# Web Api
+# Web Api - Методы
 
 ## getWallet
 Получает кошелек пользователя по его идентификатору
 
-Method [GET] - /WalletPay/GetWallet  
+[GET] - /WalletPay/GetWallet  
 
 Example /WalletPay/GetWallet?userId=1
 
@@ -49,7 +49,7 @@ Response
 ## deposit
 Метод пополнения счета или его создания.
 
-Method [PUT] - /WalletPay/Deposit
+[PUT] - /WalletPay/Deposit
 
 JSON Body Parameters
 
@@ -61,12 +61,23 @@ JSON Body Parameters
 | CodeCurrency | string | валюта хранения средств | Да, если AccountId предствлен |
 | Amount | decimal | Сумма пополнения | Да |
 
+Request example
+
+```json
+{
+    "UserId" : 1,
+    "CodeCurrency" : "GRP",
+    "AccountName": "GRP счет",
+    "Amount" : 100
+}
+```
+
 Status Code: 200
 
 ## withdraw
 Снятие средств со счета.
 
-Method [POST] - /walletPay/withdraw
+[POST] - /walletPay/withdraw
 
 JSON Body Parameters
 
@@ -76,12 +87,22 @@ JSON Body Parameters
 | AccountId | int | Идентификатор счета | Да |
 | Amount | decimal | Сумма пополнения | Да |
 
+Request example
+
+```json
+{
+    "UserId" : 1,
+    "AccountId" : 1,
+    "Amount" : 666.666
+}
+```
+
 Status Code: 200
 
 ## transferBetweenAccounts
 Метод перевода средств между своими счетами
 
-Method [POST] - /walletPay/transferBetweenAccounts
+[POST] - /walletPay/transferBetweenAccounts
 
 JSON Body Parameters
 
