@@ -6,13 +6,26 @@ namespace WalletPay.Data.Entities
     {
         private string currency;
 
+        /// <summary>
+        /// Идетификатор счета
+        /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// Идентификатор кошелька
+        /// </summary>
         public int WalletId { get; set; }
 
+        /// <summary>
+        /// Название счета
+        /// </summary>
         [Required]
         public string Name { get; set; }
 
+        /// <summary>
+        /// Валюта
+        /// e.g. RUB or EUR
+        /// </summary>
         [Required]
         public string Currency
         {
@@ -26,6 +39,9 @@ namespace WalletPay.Data.Entities
             }
         }
 
+        /// <summary>
+        /// Сумма
+        /// </summary>
         public decimal Amount { get; set; }
 
         public virtual Wallet Wallet { get; set; }

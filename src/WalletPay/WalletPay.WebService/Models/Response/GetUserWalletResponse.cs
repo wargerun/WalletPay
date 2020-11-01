@@ -14,11 +14,6 @@ namespace WalletPay.WebService.Models.Response
         [JsonPropertyName("wallet")]
         public WalletDto Wallet { get; set; }
 
-        public GetUserWalletResponse()
-        {
-
-        }
-
         public GetUserWalletResponse(User user, Wallet wallet, List<Account> accounts)
         {
             if (user != null)

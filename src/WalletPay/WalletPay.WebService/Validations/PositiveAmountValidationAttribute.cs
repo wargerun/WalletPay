@@ -2,12 +2,8 @@
 
 namespace WalletPay.WebService.Validations
 {
-    public class PositiveNumberValidationAttribute : ValidationAttribute
+    public class PositiveAmountValidationAttribute : ValidationAttribute
     {
-        public PositiveNumberValidationAttribute()
-        {
-        }
-
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             return (decimal)value < 0 

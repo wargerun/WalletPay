@@ -16,7 +16,7 @@ namespace WalletPay.WebService.Models.Requests
         [Range(1, int.MaxValue)]
         public int TransferToAccountId { get; set; }
 
-        [PositiveNumberValidation]
+        [PositiveAmountValidation]
         public decimal Amount { get; set; }
     }
 }

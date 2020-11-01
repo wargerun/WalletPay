@@ -5,7 +5,14 @@ namespace WalletPay.Data.Entities
 {
     public class Wallet
     {
+        /// <summary>
+        /// Индетификатор
+        /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Идентификатор пользователя
+        /// </summary>
         public int UserId { get; set; }
 
         /// <summary>
@@ -14,6 +21,9 @@ namespace WalletPay.Data.Entities
         /// </summary>
         public DateTime AccountUpdated { get; set; }
 
+        /// <summary>
+        /// Статус кошелька
+        /// </summary>
         public WalletStatus Status { get; set; }
 
         public virtual List<Account> Accounts { get; set; }

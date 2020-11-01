@@ -1,4 +1,6 @@
-﻿namespace WalletPay.WebService.Models.Requests
+﻿using WalletPay.WebService.Validations;
+
+namespace WalletPay.WebService.Models.Requests
 {
     public class PutDepositRequest
     {
@@ -9,6 +11,7 @@
 
         public string CodeCurrency { get; set; }
 
+        [PositiveAmountValidation]
         public decimal Amount { get; set; }
     }
 }

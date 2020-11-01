@@ -11,8 +11,8 @@ namespace WalletPay.Data.Context
         public DbSet<Account> Accounts { get; set; }
 
         public WalletPayDbContext()
-        {
-            Database.EnsureCreated();
+        { 
+            // Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlite("Data Source=../../../db/WalletPayDb.sqlite");
