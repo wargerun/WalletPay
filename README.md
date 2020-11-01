@@ -2,7 +2,7 @@
 
 - Приложение имеет стандартную трёхуровневую архитектуру. Вся бизнес-логика сконцентрирована в [WalletPayService](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/WalletPayService.cs#L11). Контроллер проксируют запросы в сервис.
 - Для хранения данных использовал базу данных SQLite
-- Обмен валюты происходит через интерфейс [ICurrencyConversion](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/CurrencyConversions/ICurrencyConversion.cs#L3), в данный момент реализованно следующее Api [XECurrencyConversion](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/CurrencyConversions/XECurrencyConversion.cs) (Не для коммерческого использования)
+- Обмен валюты происходит через интерфейс [ICurrencyConversion](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/CurrencyConversions/ICurrencyConversion.cs#L3)
 
 # Web Api - Методы
 
@@ -54,9 +54,9 @@ JSON Body Parameters
 | Name | Type | Description | Required? |
 | --- | --- | --- | --- |
 | UserId | int | Идентификатор пользователя | да |
-| AccountId | ?int | Идентификатор счета, если этот параметр не передается, то создается счет с названием ${AccountName} и валютой ${CodeCurrency} | ДаНет |
-| AccountName | string | названия счета | Да, если AccountId предствлен |
-| CodeCurrency | string | валюта хранения средств | Да, если AccountId предствлен |
+| AccountId | int | Идентификатор счета, если этот параметр не передается, то создается счет с названием ${AccountName} и валютой ${CodeCurrency} | ДаНет |
+| AccountName | string | названия счета | Да, если AccountId не предствлен |
+| CodeCurrency | string | валюта хранения средств | Да, если AccountId не предствлен |
 | Amount | decimal | Сумма пополнения | Да |
 
 Request example
