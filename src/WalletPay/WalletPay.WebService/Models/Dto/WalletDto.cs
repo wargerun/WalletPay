@@ -19,14 +19,14 @@ namespace WalletPay.WebService.Models.Dto
         [JsonPropertyName("accounts")]
         public List<AccountDto> Accounts { get; }
 
-        public WalletDto(Wallet wallet)
+        public WalletDto(Wallet wallet, List<Account> accounts)
         {
             CurrenciesUpdated = wallet.AccountUpdated;
             Status = wallet.Status.ToString();
 
-            if (wallet.Accounts != null)
+            if (accounts != null)
             {
-                Accounts = wallet.Accounts.Select(c => new AccountDto(c)).ToList();
+                Accounts = accounts.Select(c => new AccountDto(c)).ToList();
             }
         }
     }

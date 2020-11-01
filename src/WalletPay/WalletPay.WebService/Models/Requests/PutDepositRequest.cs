@@ -1,6 +1,6 @@
 ﻿namespace WalletPay.WebService.Models.Requests
 {
-    public class PostDepositRequest
+    public class PutDepositRequest
     {
         public int UserId { get; set; }
 

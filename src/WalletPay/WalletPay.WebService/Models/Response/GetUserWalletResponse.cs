@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 using WalletPay.Data.Entities;
 using WalletPay.WebService.Models.Dto;
@@ -18,7 +19,7 @@ namespace WalletPay.WebService.Models.Response
 
         }
 
-        public GetUserWalletResponse(User user, Wallet wallet)
+        public GetUserWalletResponse(User user, Wallet wallet, List<Account> accounts)
         {
             if (user != null)
             {
@@ -27,7 +28,7 @@ namespace WalletPay.WebService.Models.Response
 
             if (wallet != null)
             {
-                Wallet = new WalletDto(wallet);
+                Wallet = new WalletDto(wallet, accounts);
             }
         }
     }

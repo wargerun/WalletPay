@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using WalletPay.Core;
 using WalletPay.Data.Entities;
+using WalletPay.Data.Repositories.Accounts;
 using WalletPay.Data.Repositories.UserRepositories;
 using WalletPay.Data.Repositories.WalletRepositories;
 using WalletPay.WebService.Models;
@@ -18,17 +20,21 @@ namespace WalletPay.WebService.Controllers
     [Route("[controller]")]
     public class WalletPayController : ControllerBase
     {
-        private readonly Core.WalletPay _walletPay;
+        private readonly WalletPayService _walletPay;
         private readonly IUserRepository _userRepository;
         private readonly IWalletRepository _walletRepository;
+        private readonly IAccountRepository _accountRepository;
 
         public WalletPayController(
             IUserRepository userRepository,
-            IWalletRepository walletRepository)
+            IWalletRepository walletRepository,
+            IAccountRepository accountRepository,
+            WalletPayService walletPayService)
         {
-            _walletPay = new Core.WalletPay(walletRepository);
+            _walletPay = walletPayService;
             _userRepository = userRepository;
             _walletRepository = walletRepository;
+            _accountRepository = accountRepository;
         }
 
         [HttpGet("GetWallet")]
@@ -39,20 +45,26 @@ namespace WalletPay.WebService.Controllers
                 return BadRequest(Errors.InvalidUserId);
             }
 
-            User user = _userRepository.GetUser(userId);
+            User user = await _userRepository.GetUserAsync(userId);
 
             if (user is null)
             {
-                return NotFound("User is not found");
+                return NotFound("User is not found.");
             }
 
-            Wallet wallet = await _walletRepository.GetWalletByUserIdAsync(user.Id);
+            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == user.Id);
+            List<Account> accounts = null;
 
-            return Ok(new GetUserWalletResponse(user, wallet));
+            if (wallet != null)
+            {
+                accounts = await _accountRepository.FindAllByWhereOrderedAscendingAsync(a => a.WalletId == wallet.Id, a => a.Id);
+            }
+
+            return Ok(new GetUserWalletResponse(user, wallet, accounts));
         }
 
-        [HttpPost("deposit")]
-        public async Task<ActionResult> Deposit(PostDepositRequest depositRequest)
+        [HttpPut("deposit")]
+        public async Task<ActionResult> Deposit(PutDepositRequest depositRequest)
         {
             int userId = depositRequest.UserId;
 
@@ -66,7 +78,7 @@ namespace WalletPay.WebService.Controllers
                 return BadRequest(Errors.InvalidAmount);
             }
 
-            Wallet wallet = await _walletRepository.GetWalletByUserIdAsync(userId);
+            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == userId);
 
             Account account = new()
             {
@@ -85,6 +97,38 @@ namespace WalletPay.WebService.Controllers
             {
                 await _walletPay.DepositAsync(account);
             }
+
+            return Ok();
+        }
+
+        [HttpPost("withdraw")]
+        public async Task<ActionResult> Withdraw(PostWithdrawRequest withdrawRequest)
+        {
+            int userId = withdrawRequest.UserId;
+
+            if (userId == 0)
+            {
+                return BadRequest(Errors.InvalidUserId);
+            }
+
+            if (withdrawRequest.Amount < 0)
+            {
+                return BadRequest(Errors.InvalidAmount);
+            }
+
+            if (withdrawRequest.AccountId <= 0)
+            {
+                return BadRequest(Errors.InvalidAccountId);
+            }
+
+            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == userId);
+
+            if (!wallet.Accounts.Any(a => a.Id == withdrawRequest.AccountId))
+            {
+                return NotFound($"AccountId is not found.");
+            }
+
+            await _walletPay.WithdrawFromAccountAsync(wallet, withdrawRequest.AccountId, withdrawRequest.Amount);
 
             return Ok();
         }
