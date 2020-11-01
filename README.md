@@ -6,7 +6,95 @@ WalletPay - Сервис кошелька пользователя
 - Для хранения данных использовал базу данных SQLite
 - Обмен валюты происходит через интерфейс [ICurrencyConversion](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/CurrencyConversions/ICurrencyConversion.cs#L3), в данный момент реализованно следующее Api [XECurrencyConversion](https://github.com/wargerun/WalletPay/blob/b26ff7f7b68d799a7e1373caa9ae3eb084e574f0/src/WalletPay/WalletPay.Core/CurrencyConversions/XECurrencyConversion.cs) (Не для коммерческого использования)
 
-### База данных 
+# Web Api
+
+## getWallet
+Получает кошелек пользователя по его идентификатору
+
+Method [GET] - /WalletPay/GetWallet  
+
+Example /WalletPay/GetWallet?userId=1
+
+Status Code: 200
+
+Response
+
+```json
+{
+    "user": {
+        "id": 1,
+        "name": "First User For test"
+    },
+    "wallet": {
+        "currencies-updated": "2020-01-01T00:00:00",
+        "status": "Active",
+        "accounts": [
+            {
+                "account-id": 1,
+                "name": "Master schet",
+                "currency": "RUB",
+                "amount": 199.9846
+            },
+            {
+                "account-id": 2,
+                "name": "EUR SUPER счет",
+                "currency": "EUR",
+                "amount": 5199.75
+            }
+        ]
+    }
+}
+```
+
+## deposit
+Метод пополнения счета или его создания.
+
+Method [PUT] - /WalletPay/Deposit
+
+JSON Body Parameters
+
+| Name | Type | Description | Required? |
+| --- | --- | --- | --- |
+| UserId | int | Идентификатор пользователя | да |
+| AccountId | ?int | Идентификатор счета, если этот параметр не передается, то создается счет с названием ${AccountName} и валютой ${CodeCurrency} | ДаНет |
+| AccountName | string | названия счета | Да, если AccountId предствлен |
+| CodeCurrency | string | валюта хранения средств | Да, если AccountId предствлен |
+| Amount | decimal | Сумма пополнения | Да |
+
+Status Code: 200
+
+## withdraw
+Снятие средств со счета.
+
+Method [POST] - /walletPay/withdraw
+
+JSON Body Parameters
+
+| Name | Type | Description | Required? |
+| --- | --- | --- | --- |
+| UserId | int | Идентификатор пользователя | да |
+| AccountId | int | Идентификатор счета | Да |
+| Amount | decimal | Сумма пополнения | Да |
+
+Status Code: 200
+
+## transferBetweenAccounts
+Метод перевода средств между своими счетами
+
+Method [POST] - /walletPay/transferBetweenAccounts
+
+JSON Body Parameters
+
+| Name | Type | Description | Required? |
+| --- | --- | --- | --- |
+| UserId | int | Идентификатор пользователя | да |
+| TransferFromAccountId | int | номер счета из которого надо произвести перевод | Да |
+| TransferToAccountId | int | номер счета на который надо произвести перевод | Да |
+| Amount | decimal | Сумма перевода | Да |
+
+Status Code: 200
+
+# База данных 
 Выбор пал на SQLite исключительно из - за его простоты.
 - /db/init.sql - скрипт добавления пользователя и кошелька
 - /db/WalletPayDb.sqlite - бд
@@ -16,7 +104,7 @@ WalletPay - Сервис кошелька пользователя
 ![WalletPayDb.sqlite](https://github.com/wargerun/WalletPay/blob/main/db/ERDiagram.WalletPay.png)
 
 
-### Проекты:
+# Проекты:
 1. WalletPay.Data - Содержатся репозитории каждой из таблицы, сущности базы данных, подробнее
     * /WalletPay/src/WalletPay/WalletPay.Data/ClassDiagram.cd
     * /WalletPay/src/WalletPay/WalletPay.Data/WalletPay.Data diagrams.png
@@ -44,6 +132,4 @@ WalletPay - Сервис кошелька пользователя
       }
     }
     
-### WEeb Api
-
 
