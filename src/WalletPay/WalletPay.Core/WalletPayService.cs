@@ -59,14 +59,13 @@ namespace WalletPay.Core
         /// <summary>
         /// Асинхронная версия метода, списания средств с счета
         /// </summary>
-        /// <param name="wallet">кошелек</param>
+        /// <param name="walletId">кошелек</param>
         /// <param name="accountId">ид счета</param>
         /// <param name="amount">сумма снятий</param>
         /// <returns></returns>
-        public async Task WithdrawFromAccountAsync(Wallet wallet, int accountId, decimal amount)
+        public async Task WithdrawFromAccountAsync(int walletId, int accountId, decimal amount)
         {
-            // TODO WALLET ??!1
-            Account account = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == wallet.Id && a.Id == accountId);
+            Account account = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == accountId);
             AssertAccountExist(account, accountId);
             account.Amount -= amount;
 

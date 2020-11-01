@@ -110,7 +110,7 @@ namespace WalletPay.Core.Tests
             Wallet wallet = await walletRepository.GetFirstWhereAsync(w => w.Id == walletId);
 
             // then
-            await walletPay.WithdrawFromAccountAsync(wallet, accountId, amount);
+            await walletPay.WithdrawFromAccountAsync(wallet.Id, accountId, amount);
             Account account = wallet.Accounts.Single(a => a.Id == accountId);
 
             // when

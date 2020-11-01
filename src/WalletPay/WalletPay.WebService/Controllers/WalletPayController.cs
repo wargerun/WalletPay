@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ namespace WalletPay.WebService.Controllers
     [Route("[controller]")]
     public class WalletPayController : ControllerBase
     {
+        private const string ERROR_MESSAGE_USER_NOT_FOUND = "User is not found.";
+        private const string ERROR_MESSAGE_WALLET_NOT_FOUND = "Wallet of User is not found.";
         private readonly WalletPayService _walletPay;
         private readonly IUserRepository _userRepository;
         private readonly IWalletRepository _walletRepository;
@@ -49,7 +52,7 @@ namespace WalletPay.WebService.Controllers
 
             if (user is null)
             {
-                return NotFound("User is not found.");
+                return NotFound(ERROR_MESSAGE_USER_NOT_FOUND);
             }
 
             Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == user.Id);
@@ -73,12 +76,24 @@ namespace WalletPay.WebService.Controllers
                 return BadRequest(Errors.InvalidUserId);
             }
 
+            User user = await _userRepository.GetUserAsync(userId);
+
+            if (user is null)
+            {
+                return NotFound(ERROR_MESSAGE_USER_NOT_FOUND);
+            }
+
             if (depositRequest.Amount < 0)
             {
                 return BadRequest(Errors.InvalidAmount);
             }
 
             Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == userId);
+
+            if (wallet is null)
+            {
+                return NotFound(ERROR_MESSAGE_WALLET_NOT_FOUND);
+            }
 
             Account account = new()
             {
@@ -95,6 +110,16 @@ namespace WalletPay.WebService.Controllers
             }
             else
             {
+                if (string.IsNullOrWhiteSpace(depositRequest.CodeCurrency))
+                {
+                    return BadRequest(Errors.InvalidCodeCurrency);
+                }
+
+                if (string.IsNullOrWhiteSpace(depositRequest.AccountName))
+                {
+                    return BadRequest(Errors.InvalidAccountName);
+                }
+
                 await _walletPay.DepositAsync(account);
             }
 
@@ -123,12 +148,17 @@ namespace WalletPay.WebService.Controllers
 
             Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == userId);
 
-            if (!wallet.Accounts.Any(a => a.Id == withdrawRequest.AccountId))
+            if (wallet is null)
             {
-                return NotFound($"AccountId is not found.");
+                return NotFound(ERROR_MESSAGE_WALLET_NOT_FOUND);
             }
 
-            await _walletPay.WithdrawFromAccountAsync(wallet, withdrawRequest.AccountId, withdrawRequest.Amount);
+            if (!await _accountRepository.AnyAsync(a => a.Id == withdrawRequest.AccountId))
+            {
+                return NotFound($"Account is not found.");
+            }
+
+            await _walletPay.WithdrawFromAccountAsync(wallet.Id, withdrawRequest.AccountId, withdrawRequest.Amount);
 
             return Ok();
         }
