@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 using WalletPay.Data.Repositories;
 
-namespace WalletPay.Core.Tests
+namespace WalletPay.Core.Tests.Repositories
 {
     public abstract class CollectionRepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : class
     {
-        private readonly List<TEntity> _entities;
+        protected readonly List<TEntity> _entities;
 
         public CollectionRepositoryBase(IEnumerable<TEntity> enties)
         {

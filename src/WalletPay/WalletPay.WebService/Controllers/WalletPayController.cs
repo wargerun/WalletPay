@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using WalletPay.Core;
@@ -11,7 +9,6 @@ using WalletPay.Data.Repositories.Accounts;
 using WalletPay.Data.Repositories.UserRepositories;
 using WalletPay.Data.Repositories.WalletRepositories;
 using WalletPay.WebService.Models;
-using WalletPay.WebService.Models.Dto;
 using WalletPay.WebService.Models.Requests;
 using WalletPay.WebService.Models.Response;
 
@@ -159,6 +156,25 @@ namespace WalletPay.WebService.Controllers
             }
 
             await _walletPay.WithdrawFromAccountAsync(wallet.Id, withdrawRequest.AccountId, withdrawRequest.Amount);
+
+            return Ok();
+        }
+
+        [HttpPost("transferBetweenAccounts")]
+        public async Task<ActionResult> TransferBetweenAccounts(PostTransferBetweenAccountsRequest betweenAccountsRequest)
+        {
+            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == betweenAccountsRequest.UserId);
+
+            if (wallet is null)
+            {
+                return NotFound(ERROR_MESSAGE_WALLET_NOT_FOUND);
+            }
+
+            await _walletPay.TransferBetweenAccountsAsync(
+                walletId: wallet.Id,
+                fromAccountId: betweenAccountsRequest.TransferFromAccountId,
+                toAccountId: betweenAccountsRequest.TransferToAccountId,
+                amount: betweenAccountsRequest.Amount);
 
             return Ok();
         }

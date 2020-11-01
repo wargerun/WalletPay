@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using WalletPay.Core.CurrencyConversions;
@@ -17,11 +16,12 @@ namespace WalletPay.Core
 
         public WalletPayService(
             IWalletRepository walletRepository, 
-            IAccountRepository accountRepository)
+            IAccountRepository accountRepository,
+            ICurrencyConversion currencyConversion)
         {
             _walletRepository = walletRepository;
             _accountRepository = accountRepository;
-            _currencyConversion = new XECurrencyConversion();
+            _currencyConversion = currencyConversion;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace WalletPay.Core
         public async Task<Account> DepositAsync(Account inputAccount)
         {
             Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.Id == inputAccount.WalletId);
-            AssertWalletExist(wallet, wallet.Id);
+            assertWalletExist(wallet, wallet.Id);
             await _accountRepository.InsertAsync(inputAccount);
             return inputAccount;
         }
@@ -49,7 +49,7 @@ namespace WalletPay.Core
         public async Task<Account> DepositAsync(int walletId, int accountId, decimal amount)
         {
             Account account = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == accountId);
-            AssertAccountExist(account, accountId);
+            assertAccountExist(account, accountId);
             account.Amount += amount;
 
             account = await _accountRepository.UpdateAsync(account);
@@ -59,14 +59,14 @@ namespace WalletPay.Core
         /// <summary>
         /// Асинхронная версия метода, списания средств с счета
         /// </summary>
-        /// <param name="walletId">кошелек</param>
+        /// <param name="walletId">ид кошелек</param>
         /// <param name="accountId">ид счета</param>
         /// <param name="amount">сумма снятий</param>
         /// <returns></returns>
         public async Task WithdrawFromAccountAsync(int walletId, int accountId, decimal amount)
         {
             Account account = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == accountId);
-            AssertAccountExist(account, accountId);
+            assertAccountExist(account, accountId);
             account.Amount -= amount;
 
             if (account.Amount < 0)
@@ -78,38 +78,44 @@ namespace WalletPay.Core
         }
 
         /// <summary>
-        /// Асинхронная версия метода, перевод средств между своими счетами 
+        /// Асинхронная версия метода, перевод средств между своими счетами
         /// </summary>
-        /// <param name="wallet"></param>
-        /// <param name="accountId"></param>
-        /// <param name="amount"></param>
+        /// <param name="walletId">ид кошелек</param>
+        /// <param name="fromAccountId">номер счета из которого надо произвести перевод</param>
+        /// <param name="toAccountId">номер счета на который надо произвести перевод</param>
+        /// <param name="amount">сумма перевода</param>
         /// <returns></returns>
-        public async Task TransferBetweenAccounts(Wallet wallet, int fromAccountId, int toAccountId, decimal amount)
+        public async Task TransferBetweenAccountsAsync(int walletId, int fromAccountId, int toAccountId, decimal amount)
         {
-            Account fromTransferAccount = wallet.Accounts.SingleOrDefault(a => a.Id == fromAccountId);
-
-            if (fromTransferAccount is null)
+            if (amount <= 0)
             {
-                throw new InvalidOperationException("The transfer account in wallet is was not found");
+                return;
             }
 
-            Account toTransferAccount = wallet.Accounts.SingleOrDefault(a => a.Id == toAccountId);
+            Account fromTransferAccount = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == fromAccountId);
+            assertAccountExist(fromTransferAccount, fromAccountId);
 
-            if (toTransferAccount is null)
-            {
-                throw new InvalidOperationException("The receipt account was not found in the wallet");
-            }
+            Account toTransferAccount = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == toAccountId);
+            assertAccountExist(toTransferAccount, toAccountId);
 
-            // TODO продолжить от сюла, транзакция =) ? 
-            var oldAmount = fromTransferAccount.Amount - amount;
+            // Снятие средств
+            fromTransferAccount.Amount -= amount;
+            await _accountRepository.UpdateAsync(fromTransferAccount);
 
+            // Пополнение
             if (fromTransferAccount.Currency == toTransferAccount.Currency)
             {
-                //await DepositAsync(wallet.Id, )
+                toTransferAccount.Amount += amount;
             }
+            else
+            {
+                toTransferAccount.Amount += _currencyConversion.CurrencyConvert(fromTransferAccount.Currency, toTransferAccount.Currency, amount);
+            }
+
+            await _accountRepository.UpdateAsync(toTransferAccount);
         }
 
-        private static void AssertWalletExist(Wallet wallet, int walletId)
+        private static void assertWalletExist(Wallet wallet, int walletId)
         {
             if (wallet is null)
             {
@@ -117,7 +123,7 @@ namespace WalletPay.Core
             }
         }
 
-        private static void AssertAccountExist(Account account, int accountId)
+        private static void assertAccountExist(Account account, int accountId)
         {
             if (account is null)
             {

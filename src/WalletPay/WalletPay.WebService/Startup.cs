@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using WalletPay.Core;
+using WalletPay.Core.CurrencyConversions;
 using WalletPay.Data.Context;
 using WalletPay.Data.Repositories.Accounts;
 using WalletPay.Data.Repositories.UserRepositories;
@@ -30,10 +32,14 @@ namespace WalletPay.WebService
             });
 
             services.AddDbContext<WalletPayDbContext>();
+
             services.AddScoped<IUserRepository, UserDbRepository>();
             services.AddScoped<IWalletRepository, WalletDbRepository>();
             services.AddScoped<IAccountRepository, AccountDbRepository>();
-            services.AddTransient<Core.WalletPayService>();
+
+            services.AddTransient<ICurrencyConversion, XECurrencyConversion>();
+
+            services.AddTransient<WalletPayService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
