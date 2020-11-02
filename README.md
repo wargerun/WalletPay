@@ -64,8 +64,8 @@ Request example
 ```json
 {
     "UserId" : 1,
-    "CodeCurrency" : "GRP",
-    "AccountName": "GRP счет",
+    "CodeCurrency" : "GBP",
+    "AccountName": "GBP счет",
     "Amount" : 100
 }
 ```
