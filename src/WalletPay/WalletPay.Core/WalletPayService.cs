@@ -63,16 +63,14 @@ namespace WalletPay.Core
         /// <returns></returns>
         public async Task WithdrawFromAccountAsync(int walletId, int accountId, decimal amount)
         {
+            using var transaction = _accountRepository.BeginTransaction();
             Account account = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == accountId);
             assertAccountExist(account, accountId);
             account.Amount -= amount;
-
-            if (account.Amount < 0)
-            {
-                throw new InvalidOperationException($"Insufficient funds.");
-            }
+            assertIfAmountNegative(account.Amount);
 
             await _accountRepository.UpdateAsync(account);
+            await transaction.CommitAsync();
         }
 
         /// <summary>
@@ -85,32 +83,45 @@ namespace WalletPay.Core
         /// <returns></returns>
         public async Task TransferBetweenAccountsAsync(int walletId, int fromAccountId, int toAccountId, decimal amount)
         {
-            if (amount <= 0)
+            if (amount < 0)
             {
-                return;
+                throw new InvalidOperationException("The transfer amount cannot be negative");
             }
 
-            Account fromTransferAccount = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == fromAccountId);
-            assertAccountExist(fromTransferAccount, fromAccountId);
-
-            Account toTransferAccount = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == toAccountId);
-            assertAccountExist(toTransferAccount, toAccountId);
-
-            // Снятие средств
-            fromTransferAccount.Amount -= amount;
-            await _accountRepository.UpdateAsync(fromTransferAccount);
-
-            // Пополнение
-            if (fromTransferAccount.Currency == toTransferAccount.Currency)
+            using (var transaction = _accountRepository.BeginTransaction())
             {
-                toTransferAccount.Amount += amount;
-            }
-            else
-            {
-                toTransferAccount.Amount += _currencyConversion.CurrencyConvert(fromTransferAccount.Currency, toTransferAccount.Currency, amount);
-            }
+                Account fromTransferAccount = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == fromAccountId);
+                assertAccountExist(fromTransferAccount, fromAccountId);
 
-            await _accountRepository.UpdateAsync(toTransferAccount);
+                Account toTransferAccount = await _accountRepository.GetFirstWhereAsync(a => a.WalletId == walletId && a.Id == toAccountId);
+                assertAccountExist(toTransferAccount, toAccountId);
+
+                // Снятие средств
+                fromTransferAccount.Amount -= amount;
+                assertIfAmountNegative(fromTransferAccount.Amount);
+                await _accountRepository.UpdateAsync(fromTransferAccount);
+
+                // Пополнение
+                if (fromTransferAccount.Currency == toTransferAccount.Currency)
+                {
+                    toTransferAccount.Amount += amount;
+                }
+                else
+                {
+                    toTransferAccount.Amount += _currencyConversion.CurrencyConvert(fromTransferAccount.Currency, toTransferAccount.Currency, amount);
+                }
+
+                await _accountRepository.UpdateAsync(toTransferAccount);
+                await transaction.CommitAsync();
+            }
+        }
+          
+        private static void assertIfAmountNegative(decimal accountAmount)
+        {
+            if (accountAmount < 0)
+            {
+                throw new InvalidOperationException("Insufficient funds.");
+            }
         }
 
         private static void assertWalletExist(Wallet wallet, int walletId)
