@@ -27,11 +27,9 @@ namespace WalletPay.Core
         /// <summary>
         /// Асинхронная версия метода, создания счета в кошельке
         /// </summary>
-        /// <param name="userId">ID пользователя</param>
-        /// <param name="codeCurrency">код валюты</param>
-        /// <param name="amount">сумма пополнения</param>
+        /// <param name="inputAccount">счета</param>
         /// <returns>актуальна валюта после успешной транзакции</returns>
-        public async Task<Account> DepositAsync(Account inputAccount)
+        public async Task<Account> CreateAccountInWalletAsync(Account inputAccount)
         {
             Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.Id == inputAccount.WalletId);
             assertWalletExist(wallet, wallet.Id);
@@ -42,7 +40,7 @@ namespace WalletPay.Core
         /// <summary>
         /// Асинхронная версия метода, пополнения кошелька
         /// </summary>
-        /// <param name="userId">ID пользователя</param>
+        /// <param name="walletId">ID</param>
         /// <param name="accountId">ID счета</param>
         /// <param name="amount">сумма пополнения</param>
         /// <returns>актуальна валюта после успешной транзакции</returns>

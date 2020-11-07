@@ -88,7 +88,7 @@ namespace WalletPay.Core.Tests
         [Theory]
         [InlineData(1, "RUB", 666.66, 666.66)]
         [InlineData(2, "EUR", 300.123, 300.123)]
-        public async Task DepositAsyncTest(int walletId, string codeCurrency, decimal amount, decimal expectedAmount)
+        public async Task CreateAccountInWalletAsyncTest(int walletId, string codeCurrency, decimal amount, decimal expectedAmount)
         {
             // given
             MockWalletRepository walletRepository = new(_wallets);
@@ -96,7 +96,7 @@ namespace WalletPay.Core.Tests
             WalletPayService walletPay = new(walletRepository, accountRepository, _mockCurrency);
 
             // then
-            Account account = await walletPay.DepositAsync(new()
+            Account account = await walletPay.CreateAccountInWalletAsync(new()
             {
                 WalletId = walletId,
                 Currency = codeCurrency,
