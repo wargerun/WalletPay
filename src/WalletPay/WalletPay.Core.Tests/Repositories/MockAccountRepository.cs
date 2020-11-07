@@ -3,13 +3,14 @@ using System.Threading.Tasks;
 
 using WalletPay.Data.Entities;
 using WalletPay.Data.Repositories.Accounts;
+using WalletPay.Data.Repositories.Transactions;
 
 namespace WalletPay.Core.Tests.Repositories
 {
     public class MockAccountRepository : CollectionRepositoryBase<Account>, IAccountRepository
     {
-        public MockAccountRepository(IEnumerable<Account> _accounts)
-            : base(_accounts)
+        public MockAccountRepository(IEnumerable<Account> accounts)
+            : base(accounts)
         {
         }
 
@@ -24,5 +25,7 @@ namespace WalletPay.Core.Tests.Repositories
 
             return account;
         }
+
+        public IDatabaseTransaction BeginTransaction() => new MockTransaction();
     }
 }

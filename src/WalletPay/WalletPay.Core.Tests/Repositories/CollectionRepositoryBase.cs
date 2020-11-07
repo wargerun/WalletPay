@@ -13,9 +13,9 @@ namespace WalletPay.Core.Tests.Repositories
     {
         protected readonly List<TEntity> _entities;
 
-        public CollectionRepositoryBase(IEnumerable<TEntity> enties)
+        public CollectionRepositoryBase(IEnumerable<TEntity> entities)
         {
-            _entities = enties.ToList();
+            _entities = entities.ToList();
         }
 
         public Task<bool> AnyAsync(Expression<Func<TEntity, bool>> match)
@@ -25,29 +25,15 @@ namespace WalletPay.Core.Tests.Repositories
             return Task.FromResult(result);
         }
 
-        public Task<int> Count()
+        public Task<int> Count(Expression<Func<TEntity, bool>> match)
         {
-            return Task.FromResult(_entities.Count);
+            Func<TEntity, bool> func = match.Compile();
+            return Task.FromResult(_entities.Count(func));
         }
 
         public void Delete(TEntity entity)
         {
             _entities.Remove(entity);
-        }
-
-        public void DeleteRange(ICollection<TEntity> entities)
-        {
-            foreach (var entity in entities)
-            {
-                _entities.Remove(entity);
-            }
-        }
-
-        public Task<List<TEntity>> FindAllByWhereAsync(Expression<Func<TEntity, bool>> match)
-        {
-            Func<TEntity, bool> func = match.Compile();
-            List<TEntity> entities = _entities.Where(func).ToList();
-            return Task.FromResult(entities);
         }
 
         public Task<List<TEntity>> FindAllByWhereOrderedAscendingAsync(Expression<Func<TEntity, bool>> match, Expression<Func<TEntity, object>> orderBy)
@@ -66,11 +52,6 @@ namespace WalletPay.Core.Tests.Repositories
             return Task.FromResult(entities);
         }
 
-        public Task<List<TEntity>> GetAllAsync()
-        {
-            return Task.FromResult(_entities);
-        }
-
         public Task<TEntity> GetFirstWhereAsync(Expression<Func<TEntity, bool>> match)
         {
             Func<TEntity, bool> func = match.Compile();
@@ -84,22 +65,7 @@ namespace WalletPay.Core.Tests.Repositories
             return Task.FromResult(entity);
         }
 
-        public Task<IList<TEntity>> InsertRangeAsync(IList<TEntity> entities, bool saveChanges = true)
-        {
-            foreach (var entity in entities)
-            {
-                _entities.Add(entity);
-            }
-
-            return Task.FromResult(entities);
-        }
-
         public virtual Task<TEntity> UpdateAsync(TEntity entityToUpdate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual Task<IList<TEntity>> UpdateRangeAsync(IList<TEntity> entities)
         {
             throw new NotImplementedException();
         }
