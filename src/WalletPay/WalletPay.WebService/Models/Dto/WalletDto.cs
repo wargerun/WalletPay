@@ -13,6 +13,9 @@ namespace WalletPay.WebService.Models.Dto
         [JsonPropertyName("currencies-updated")]
         public DateTime CurrenciesUpdated { get; }
 
+        [JsonPropertyName("wallet-id")]
+        public int WalletId { get; }
+
         [JsonPropertyName("status")]
         public string Status { get; }
 
@@ -21,6 +24,7 @@ namespace WalletPay.WebService.Models.Dto
 
         public WalletDto(Wallet wallet, List<Account> accounts)
         {
+            WalletId = wallet.Id;
             CurrenciesUpdated = wallet.AccountUpdated;
             Status = wallet.Status.ToString();
 

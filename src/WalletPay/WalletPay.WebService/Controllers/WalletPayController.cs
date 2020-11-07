@@ -9,6 +9,7 @@ using WalletPay.Data.Repositories.Accounts;
 using WalletPay.Data.Repositories.UserRepositories;
 using WalletPay.Data.Repositories.WalletRepositories;
 using WalletPay.WebService.Models;
+using WalletPay.WebService.Models.Dto;
 using WalletPay.WebService.Models.Requests;
 using WalletPay.WebService.Models.Response;
 
@@ -37,14 +38,9 @@ namespace WalletPay.WebService.Controllers
             _accountRepository = accountRepository;
         }
 
-        [HttpGet("GetWallet")]
-        public async Task<ActionResult<GetUserWalletResponse>> GetWallet(int userId)
+        [HttpGet("GetWalletByUserId")]
+        public async Task<ActionResult<GetUserWalletResponse>> GetWalletByUserId(int userId)
         {
-            if (userId == 0)
-            {
-                return BadRequest(Errors.InvalidUserId);
-            }
-
             User user = await _userRepository.GetUserAsync(userId);
 
             if (user is null)
@@ -57,68 +53,70 @@ namespace WalletPay.WebService.Controllers
 
             if (wallet != null)
             {
-                accounts = await _accountRepository.FindAllByWhereOrderedAscendingAsync(a => a.WalletId == wallet.Id, a => a.Id);
+                accounts = await FindAllByWhereOrderedAscendingAsync(wallet.Id);
             }
 
             return Ok(new GetUserWalletResponse(user, wallet, accounts));
         }
 
-        [HttpPut("deposit")]
-        public async Task<ActionResult> Deposit(PutDepositRequest depositRequest)
+        [HttpGet("GetWallet")]
+        public async Task<ActionResult<GetUserWalletResponse>> GetWallet(int walletId)
         {
-            int userId = depositRequest.UserId;
-
-            if (userId == 0)
-            {
-                return BadRequest(Errors.InvalidUserId);
-            }
-
-            User user = await _userRepository.GetUserAsync(userId);
+            User user = await _userRepository.GetFirstWhereAsync(u => u.Wallet.Id == walletId);
 
             if (user is null)
             {
                 return NotFound(ERROR_MESSAGE_USER_NOT_FOUND);
             }
 
-            if (depositRequest.Amount < 0)
+            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.Id == walletId);
+            List<Account> accounts = null;
+
+            if (wallet != null)
             {
-                return BadRequest(Errors.InvalidAmount);
+                accounts = await FindAllByWhereOrderedAscendingAsync(wallet.Id);
             }
 
-            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == userId);
+            return Ok(new GetUserWalletResponse(user, wallet, accounts));
+        }
+
+        private Task<List<Account>> FindAllByWhereOrderedAscendingAsync(int walletId)
+        {
+            return _accountRepository.FindAllByWhereOrderedAscendingAsync(a => a.WalletId == walletId, a => a.Id);
+        }
+
+        [HttpPost("createAccountInWallet")]
+        public async Task<ActionResult> CreateAccountInWallet(PostCreateAccountInWalletRequest accountInWalletRequest)
+        {
+            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.Id == accountInWalletRequest.WalletId);
 
             if (wallet is null)
             {
                 return NotFound(ERROR_MESSAGE_WALLET_NOT_FOUND);
             }
 
-            Account account = new()
+            Account account = await _walletPay.CreateAccountInWalletAsync(new()
             {
                 WalletId = wallet.Id,
-                Amount = depositRequest.Amount,
-                Name = depositRequest.AccountName,
-                Currency = depositRequest.CodeCurrency,
-            };
+                Amount = accountInWalletRequest.Amount,
+                Name = accountInWalletRequest.AccountName,
+                Currency = accountInWalletRequest.CodeCurrency,
+            });
 
-            if (depositRequest.AccountId.HasValue)
+            return Created(nameof(GetWallet), new AccountDto(account));
+        }
+
+        [HttpPut("deposit")]
+        public async Task<ActionResult> Deposit(PutDepositRequest depositRequest)
+        {
+            Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == depositRequest.UserId);
+
+            if (wallet is null)
             {
-                account.Id = depositRequest.AccountId.Value;
-                await _walletPay.DepositAsync(account.WalletId, account.Id, account.Amount);
+                return NotFound(ERROR_MESSAGE_WALLET_NOT_FOUND);
             }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(depositRequest.CodeCurrency))
-                {
-                    return BadRequest(Errors.InvalidCodeCurrency);
-                }
-
-                if (string.IsNullOrWhiteSpace(depositRequest.AccountName))
-                {
-                    return BadRequest(Errors.InvalidAccountName);
-                }
-
-                await _walletPay.DepositAsync(account);
-            }
+            
+            await _walletPay.DepositAsync(wallet.Id, depositRequest.AccountId, depositRequest.Amount);
 
             return Ok();
         }
@@ -127,21 +125,6 @@ namespace WalletPay.WebService.Controllers
         public async Task<ActionResult> Withdraw(PostWithdrawRequest withdrawRequest)
         {
             int userId = withdrawRequest.UserId;
-
-            if (userId == 0)
-            {
-                return BadRequest(Errors.InvalidUserId);
-            }
-
-            if (withdrawRequest.Amount < 0)
-            {
-                return BadRequest(Errors.InvalidAmount);
-            }
-
-            if (withdrawRequest.AccountId <= 0)
-            {
-                return BadRequest(Errors.InvalidAccountId);
-            }
 
             Wallet wallet = await _walletRepository.GetFirstWhereAsync(w => w.UserId == userId);
 
