@@ -7,9 +7,9 @@
 # Web Api - Методы
 
 ## GetWalletByUserId
-Получает кошелек пользователя по его идентификатору
+> Получает кошелек пользователя по идентификатору пользователя
 
-[GET] - /WalletPay/GetWalletByUserId  
+**[GET]** - /WalletPay/GetWalletByUserId  
 
 Example /WalletPay/GetWalletByUserId?userId=1
 
@@ -45,10 +45,10 @@ Example /WalletPay/GetWalletByUserId?userId=1
     }
     ```
 
-## GetWalletByUserId
-Получает кошелек пользователя по его идентификатору
+## GetWallet
+>Получает кошелек пользователя по его идентификатору
 
-[GET] - /WalletPay/GetWallet  
+**[GET]** - /WalletPay/GetWallet  
 
 Example /WalletPay/GetWallet?walletId=1
 
@@ -85,10 +85,9 @@ Example /WalletPay/GetWallet?walletId=1
     ```
 
 ## createAccountInWallet
-
-Метод создания счета.
-
-[POST] - /WalletPay/createAccountInWallet
+> Метод создания счета.
+ 
+**[POST]** - /WalletPay/createAccountInWallet
 
 JSON Body Parameters
 
@@ -110,7 +109,7 @@ JSON Body Parameters
     }
     ```
 
-#### response 
+### Response 
     Status Code: 201
 
     ```json
@@ -124,9 +123,9 @@ JSON Body Parameters
 
 
 ## deposit
-Метод пополнения счета или его создания.
+> Метод пополнения счета.
 
-[PUT] - /WalletPay/Deposit
+**[PUT]** - /WalletPay/Deposit
 
 JSON Body Parameters
 
@@ -151,9 +150,9 @@ JSON Body Parameters
 
 
 ## withdraw
-Снятие средств со счета.
+> Снятие средств со счета.
 
-[POST] - /walletPay/withdraw
+**[POST]** - /walletPay/withdraw
 
 JSON Body Parameters
 
@@ -163,22 +162,23 @@ JSON Body Parameters
 | AccountId | int | Идентификатор счета | Да |
 | Amount | decimal | Сумма пополнения | Да |
 
-Request example
+### Request
 
-```json
-{
-    "UserId" : 1,
-    "AccountId" : 1,
-    "Amount" : 666.666
-}
-```
+    ```json
+    {
+        "UserId" : 1,
+        "AccountId" : 1,
+        "Amount" : 666.666
+    }
+    ```
 
-Status Code: 200
+### Response 
+    Status Code: 200
 
 ## transferBetweenAccounts
-Метод перевода средств между своими счетами
+> Метод перевода средств между своими счетами
 
-[POST] - /walletPay/transferBetweenAccounts
+**[POST]** - /walletPay/transferBetweenAccounts
 
 JSON Body Parameters
 
@@ -189,7 +189,16 @@ JSON Body Parameters
 | TransferToAccountId | int | номер счета на который надо произвести перевод | Да |
 | Amount | decimal | Сумма перевода | Да |
 
-Status Code: 200
+### Request
+    {
+        "UserId" : 1,
+        "TransferFromAccountId" : 4,
+        "TransferToAccountId" : 3,
+        "Amount" : 7665
+    }
+
+### Response 
+    Status Code: 200
 
 # База данных 
 Выбор пал на SQLite исключительно из - за его простоты.
