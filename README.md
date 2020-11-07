@@ -6,43 +6,122 @@
 
 # Web Api - Методы
 
-## getWallet
+## GetWalletByUserId
+Получает кошелек пользователя по его идентификатору
+
+[GET] - /WalletPay/GetWalletByUserId  
+
+Example /WalletPay/GetWalletByUserId?userId=1
+
+### Response
+
+    Status Code: 200
+
+    ```json
+    {
+        "user": {
+            "id": 1,
+            "name": "First User For test"
+        },
+        "wallet": {
+            "currencies-updated": "2020-01-01T00:00:00",
+            "wallet-id": 1,
+            "status": "Active",
+            "accounts": [
+                {
+                    "account-id": 1,
+                    "name": "Master schet",
+                    "currency": "RUB",
+                    "amount": 199.9846
+                },
+                {
+                    "account-id": 2,
+                    "name": "EUR SUPER счет",
+                    "currency": "EUR",
+                    "amount": 5199.75
+                }
+            ]
+        }
+    }
+    ```
+
+## GetWalletByUserId
 Получает кошелек пользователя по его идентификатору
 
 [GET] - /WalletPay/GetWallet  
 
-Example /WalletPay/GetWallet?userId=1
+Example /WalletPay/GetWallet?walletId=1
 
-Status Code: 200
+### Response
 
-Response
+    Status Code: 200
 
-```json
-{
-    "user": {
-        "id": 1,
-        "name": "First User For test"
-    },
-    "wallet": {
-        "currencies-updated": "2020-01-01T00:00:00",
-        "status": "Active",
-        "accounts": [
-            {
-                "account-id": 1,
-                "name": "Master schet",
-                "currency": "RUB",
-                "amount": 199.9846
-            },
-            {
-                "account-id": 2,
-                "name": "EUR SUPER счет",
-                "currency": "EUR",
-                "amount": 5199.75
-            }
-        ]
+    ```json
+    {
+        "user": {
+            "id": 1,
+            "name": "First User For test"
+        },
+        "wallet": {
+            "currencies-updated": "2020-01-01T00:00:00",
+            "wallet-id": 1,
+            "status": "Active",
+            "accounts": [
+                {
+                    "account-id": 3,
+                    "name": "GRP счет",
+                    "currency": "GRP",
+                    "amount": 0.332
+                },
+                {
+                    "account-id": 4,
+                    "name": "GRP счет",
+                    "currency": "GRP",
+                    "amount": 1533.0
+                }
+            ]
+        }
     }
-}
-```
+    ```
+
+## createAccountInWallet
+
+Метод создания счета.
+
+[POST] - /WalletPay/createAccountInWallet
+
+JSON Body Parameters
+
+| Name | Type | Description | Required? |
+| --- | --- | --- | --- |
+| WalletId | int | Идентификатор кошелька | да |
+| AccountName | string | названия счета | Да |
+| CodeCurrency | string | валюта хранения средств | Да |
+| Amount | decimal | Сумма пополнения | Да |
+
+### Request
+
+    ```json
+    {
+        "WalletId" : 1,
+        "CodeCurrency" : "GRP",
+        "AccountName": "GRP счет",
+        "Amount" : 100
+    }
+    ```
+
+#### response 
+    Status Code: 201
+
+    ```json
+    {
+        "account-id": 5,
+        "name": "GRP счет",
+        "currency": "GRP",
+        "amount": 100
+    }
+    ```
+
 
 ## deposit
 Метод пополнения счета или его создания.
@@ -54,23 +133,22 @@ JSON Body Parameters
 | Name | Type | Description | Required? |
 | --- | --- | --- | --- |
 | UserId | int | Идентификатор пользователя | да |
-| AccountId | int | Идентификатор счета, если этот параметр не передается, то создается счет с названием ${AccountName} и валютой ${CodeCurrency} | ДаНет |
-| AccountName | string | названия счета | Да, если AccountId не предствлен |
-| CodeCurrency | string | валюта хранения средств | Да, если AccountId не предствлен |
+| AccountId | int | Идентификатор счета | Да |
 | Amount | decimal | Сумма пополнения | Да |
 
-Request example
+### Request 
 
-```json
-{
-    "UserId" : 1,
-    "CodeCurrency" : "GBP",
-    "AccountName": "GBP счет",
-    "Amount" : 100
-}
-```
+    Status Code: 200
 
-Status Code: 200
+    ```json
+    {
+        "UserId" : 1,
+        "CodeCurrency" : "GBP",
+        "AccountName": "GBP счет",
+        "Amount" : 100
+    }
+    ```
+
 
 ## withdraw
 Снятие средств со счета.
